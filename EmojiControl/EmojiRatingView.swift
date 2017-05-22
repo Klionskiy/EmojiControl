@@ -14,22 +14,26 @@ protocol EmojiRatingViewDelegate
     func saveRating(rating: Int)
 }
 
-class RatingButton : UIButton {
+class RatingButton : UIButton
+{
     fileprivate static let selectedScale = 1.3
     override var isSelected: Bool
         {
         willSet
         {
-            UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
-                if newValue
-                {
+            if newValue
+            {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
                     self.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-                }
-                else
-                {
+                })
+                
+            }
+            else
+            {
+                UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
                     self.transform = CGAffineTransform.identity
-                }
-            })
+                })
+            }
         }
     }
 }
@@ -39,10 +43,17 @@ class EmojiRatingView: UIView
     private var ratingButtons = [RatingButton]()
     private var emoji = [#imageLiteral(resourceName: "angry"), #imageLiteral(resourceName: "no_emotions"), #imageLiteral(resourceName: "confused"), #imageLiteral(resourceName: "like"), #imageLiteral(resourceName: "love")]
     
-    private var touchHasEnded = false
     private var delegate : EmojiRatingViewDelegate?
     
+    private enum events :Int {
+        case began = 0
+        case end = 1
+        case move = 2
+    }
+    
     // MARK: - Properties
+    
+    private var ratingForTouchBegan : Int = -1
     
     public var rating : Int = -1
     {
@@ -55,8 +66,7 @@ class EmojiRatingView: UIView
             setNeedsLayout()
         }
     }
-    private var ratingForTouchBegan : Int = -1
-    public var maxRating : Int = 5
+    private var maxRating : Int = 5
     {
         didSet
         {
@@ -64,7 +74,7 @@ class EmojiRatingView: UIView
         }
     }
     
-    var spacing : CGFloat
+    private var spacing : CGFloat
     {
         return buttonsWidth/(CGFloat(maxRating) + 1)
     }
@@ -88,7 +98,7 @@ class EmojiRatingView: UIView
     
     // MARK: - Create and set buttons
     
-    public func createButtons()
+    private func createButtons()
     {
         guard ratingButtons.count == 0
             else { return }
@@ -97,31 +107,29 @@ class EmojiRatingView: UIView
         {
             let button = RatingButton()
             let basicImage = emoji[i].convertToGrayScale()
-            //button.backgroundColor = UIColor.green
             button.setImage(basicImage, for: .normal)
             button.setImage(emoji[i], for: .selected)
-            //            button.setImage(emoji[i], for: [.highlighted, .selected])
             button.imageView?.contentMode = .scaleAspectFit
             
             button.isUserInteractionEnabled = false
             button.adjustsImageWhenHighlighted = false
+            
             let buttonFrame = CGRect(x: 0, y: 0, width: buttonsWidth, height: buttonsHeight)
             button.frame = buttonFrame
+            
             ratingButtons.append(button)
             addSubview(button)
         }
     }
     
-    override func layoutSubviews() {
+    override func layoutSubviews()
+    {
         super.layoutSubviews()
         self.createButtons()
-        //self.spacing = (self.frame.width - CGFloat(ratingButtons.count) * buttonsLength) / CGFloat(ratingButtons.count)
-        //        var buttonFrame = CGRect(x: 0, y: 0, width: buttonsLength, height: buttonsHeight)
-        print(spacing)
+        
         for (index, button) in ratingButtons.enumerated()
         {
             button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (buttonsWidth + spacing)
-            print(button.isSelected)
         }
         
         updateButtonsSelectedState()
@@ -132,7 +140,7 @@ class EmojiRatingView: UIView
         return CGSize(width: buttonsWidth, height: buttonsHeight)
     }
     
-    func updateButtonsSelectedState()
+    private func updateButtonsSelectedState()
     {
         if rating == -1
         {
@@ -144,7 +152,7 @@ class EmojiRatingView: UIView
         }
     }
     
-    func deselectButtons()
+    private func deselectButtons()
     {
         for button in ratingButtons
         {
@@ -153,7 +161,7 @@ class EmojiRatingView: UIView
         }
     }
     
-    func setSingleSelection(sender: UIButton)
+    private func setSingleSelection(sender: UIButton)
     {
         deselectButtons()
         sender.isSelected = true
@@ -161,7 +169,7 @@ class EmojiRatingView: UIView
     
     // MARK: - Handle touch events
     
-    func handleTouchEvent(touches: Set<UITouch>, withEvent event: UIEvent?, type : events)
+    private func handleTouchEvent(touches: Set<UITouch>, withEvent event: UIEvent?, type : events)
     {
         if let touch = touches.first
         {
@@ -169,16 +177,13 @@ class EmojiRatingView: UIView
             
             for button in ratingButtons
             {
-                
-                
                 if button.frame.contains(position)
                 {
-                    switch type {
+                    switch type
+                    {
                     case .began:
                         ratingForTouchBegan = ratingButtons.index(of: button)!
-                        
                     case .end:
-                        
                         if button.isSelected && ratingForTouchBegan == rating {
                             deselectButtons()
                             rating = -1
@@ -194,53 +199,12 @@ class EmojiRatingView: UIView
                             rating = ratingButtons.index(of: button)!
                             return
                         }
-                        
-                        
                     }
-                    
-                    //button.isSelected = true
-                                    }
+                }
             }
         }
     }
-//    func handleEndTouchEvent(touches: Set<UITouch>, withEvent event: UIEvent?)
-//    {
-//        if let touch = touches.first
-//        {
-//            let position = touch.location(in: self)
-//            for button in ratingButtons
-//            {
-//                if button.frame.contains(position)
-//                {
-//                    //button.isSelected = true
-//                    rating = ratingButtons.index(of: button)!
-//                    return
-//                } else {
-//                    
-//                
-//            }
-//        }
-//    }
-//    func handleBeginTouchEvent(touches: Set<UITouch>, withEvent event: UIEvent?)
-//    {
-//        if let touch = touches.first
-//        {
-//            let position = touch.location(in: self)
-//            for button in ratingButtons
-//            {
-//                if button.frame.contains(position)
-//                {
-//                    return
-//                }
-//            }
-//            deselectButtons()
-//        }
-//    }
-    enum events :Int {
-        case began = 0
-        case end = 1
-        case move = 2
-    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         handleTouchEvent(touches: touches, withEvent: event, type: .began)
@@ -255,24 +219,6 @@ class EmojiRatingView: UIView
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         handleTouchEvent(touches: touches, withEvent: event, type: .move)
-    }
-    
-    
-    
-    
-    
-    
-    
-    func resizeImage(image: UIImage) -> UIImage {
-        
-        let scale = 200 / image.size.width
-        let newHeight = image.size.height * scale
-        UIGraphicsBeginImageContext(CGSize(width: 200, height: newHeight))
-        image.draw(in: CGRect(x:0, y:0, width: 200, height: newHeight))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage!
     }
     
 }
