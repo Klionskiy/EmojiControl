@@ -9,30 +9,43 @@
 import UIKit
 import Foundation
 
+// MARK: - EmojiRatingViewDelegate Protocol
+
 protocol EmojiRatingViewDelegate
 {
     func saveRating(rating: Int)
 }
 
+// MARK: - RatingAnimationSettingsDelegate Protocol
+
+protocol RatingAnimationSettingsDelegate
+{
+    func getScale() -> CGFloat
+}
+
+// MARK: - RatingButton Class
+
 class RatingButton : UIButton
 {
-    fileprivate static let selectedScale = 1.3
+    var ratingAnimationSettingsDelegate : RatingAnimationSettingsDelegate?
     override var isSelected: Bool
         {
         willSet
         {
-            if newValue
-            {
-                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
-                    self.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-                })
-                
-            }
-            else
-            {
-                UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
-                    self.transform = CGAffineTransform.identity
-                })
+            if let delegate = ratingAnimationSettingsDelegate {
+                if newValue
+                {
+                    let scale = delegate.getScale()
+                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
+                        self.transform = CGAffineTransform(scaleX: scale, y: scale)
+                    })
+                }
+                else
+                {
+                    UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
+                        self.transform = CGAffineTransform.identity
+                    })
+                }
             }
         }
     }
@@ -40,20 +53,34 @@ class RatingButton : UIButton
 
 class EmojiRatingView: UIView
 {
-    private var ratingButtons = [RatingButton]()
-    private var emoji = [#imageLiteral(resourceName: "angry"), #imageLiteral(resourceName: "no_emotions"), #imageLiteral(resourceName: "confused"), #imageLiteral(resourceName: "like"), #imageLiteral(resourceName: "love")]
     
-    private var delegate : EmojiRatingViewDelegate?
     
+    // MARK: - Inspectable properties
+    @IBInspectable
+    public var selectedScale: CGFloat = 1.3
+    
+    // MARK: Properties
     private enum events :Int {
         case began = 0
         case end = 1
         case move = 2
     }
     
-    // MARK: - Properties
-    
     private var ratingForTouchBegan : Int = -1
+    
+    private var ratingButtons = [RatingButton]()
+    private var emoji = [#imageLiteral(resourceName: "angry"), #imageLiteral(resourceName: "no_emotions"), #imageLiteral(resourceName: "confused"), #imageLiteral(resourceName: "like"), #imageLiteral(resourceName: "love")]
+    
+    private var delegate : EmojiRatingViewDelegate?
+    
+    
+    
+    
+    
+    
+    
+    
+    // MARK: Computed Properties
     
     public var rating : Int = -1
     {
@@ -63,32 +90,29 @@ class EmojiRatingView: UIView
             {
                 rating = maxRating
             }
+            if rating != -1 {
+                //self.layoutMargins = UIEdgeInsets(top: 0, left: frame.width/CGFloat(maxRating), bottom: 0, right: frame.width/CGFloat(maxRating))
+                //self.frame.size = CGSize(width: frame.size.width/selectedScale, height: frame.size.height/selectedScale)
+            } else {
+                
+            }
             setNeedsLayout()
         }
     }
-    private var maxRating : Int = 5
+    private var maxRating : Int
     {
-        didSet
-        {
-            setNeedsLayout()
-        }
+        return emoji.count
     }
     
     private var spacing : CGFloat
     {
-        return buttonsWidth/(CGFloat(maxRating) + 1)
-    }
-    
-    // MARK: - Computed properties
-    
-    private var buttonsLength: CGFloat
-    {
-        return frame.width / 5
+        return  (frame.width - buttonsWidth * CGFloat(maxRating))/(CGFloat(maxRating) + 1)
     }
     
     private var buttonsWidth: CGFloat
     {
-        return frame.width / (CGFloat(maxRating) + 1) > frame.height ? frame.height : frame.width / (CGFloat(maxRating) + 1)
+        let maxWidth = frame.width / (CGFloat(maxRating) + (CGFloat(maxRating) + 1)*(selectedScale - 1))
+        return maxWidth > frame.height ? frame.height :  maxWidth
     }
     
     private var buttonsHeight: CGFloat
@@ -96,7 +120,19 @@ class EmojiRatingView: UIView
         return buttonsWidth
     }
     
-    // MARK: - Create and set buttons
+    // MARK: Override Properties
+    
+    override var intrinsicContentSize: CGSize
+    {
+        return CGSize(width: buttonsWidth, height: buttonsHeight)
+    }
+    //    override var frame: CGRect {
+    //        willSet {
+    //            setNeedsLayout()
+    //        }
+    //    }
+    // MARK: - UI
+    
     
     private func createButtons()
     {
@@ -106,38 +142,62 @@ class EmojiRatingView: UIView
         for i in 0..<maxRating
         {
             let button = RatingButton()
+            button.ratingAnimationSettingsDelegate = self
             let basicImage = emoji[i].convertToGrayScale()
             button.setImage(basicImage, for: .normal)
             button.setImage(emoji[i], for: .selected)
-            button.imageView?.contentMode = .scaleAspectFit
-            
+            button.imageView?.contentMode = .scaleAspectFill
             button.isUserInteractionEnabled = false
             button.adjustsImageWhenHighlighted = false
             
-            let buttonFrame = CGRect(x: 0, y: 0, width: buttonsWidth, height: buttonsHeight)
-            button.frame = buttonFrame
-            
+            //button.backgroundColor = UIColor.black
             ratingButtons.append(button)
             addSubview(button)
         }
     }
     
+    // MARK: Layout
+    
     override func layoutSubviews()
     {
         super.layoutSubviews()
         self.createButtons()
+        UIView.animate(withDuration: 0.2) {}
         
-        for (index, button) in ratingButtons.enumerated()
+        
+        if   0...maxRating ~= rating
         {
-            button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (buttonsWidth + spacing)
+            for (index, button) in ratingButtons.enumerated()
+            {
+                
+//                let smallerWidth = buttonsWidth / selectedScale
+//                switch index {
+//                case rating:
+//                    button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (smallerWidth + spacing)
+//
+//                case (rating + 1)...maxRating:
+//                    button.center.x = smallerWidth/2  + spacing + CGFloat(index - 1) * (smallerWidth + spacing) + (buttonsWidth + spacing)
+//                   // button.bounds.size = CGSize(width: smallerWidth, height: smallerWidth)
+//                default:
+//                    button.center.x = smallerWidth/2  + spacing + CGFloat(index) * (smallerWidth + spacing)
+//                    //button.bounds.size = CGSize(width: smallerWidth, height: smallerWidth)
+//                }
+                button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (buttonsWidth + spacing)
+                button.center.y = bounds.height/2
+                button.bounds.size = intrinsicContentSize
+            }
+        } else
+        {
+            for (index, button) in ratingButtons.enumerated()
+            {
+                button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (buttonsWidth + spacing)
+                button.bounds.size = intrinsicContentSize
+                button.center.y = bounds.height/2
+                
+            }
+            
         }
-        
         updateButtonsSelectedState()
-    }
-    
-    override var intrinsicContentSize: CGSize
-    {
-        return CGSize(width: buttonsWidth, height: buttonsHeight)
     }
     
     private func updateButtonsSelectedState()
@@ -177,12 +237,13 @@ class EmojiRatingView: UIView
             
             for button in ratingButtons
             {
-                if button.frame.contains(position)
+                if button.frame.origin.x...(button.frame.origin.x + button.frame.width) ~= position.x
                 {
                     switch type
                     {
                     case .began:
                         ratingForTouchBegan = ratingButtons.index(of: button)!
+                        return
                     case .end:
                         if button.isSelected && ratingForTouchBegan == rating {
                             deselectButtons()
@@ -192,9 +253,10 @@ class EmojiRatingView: UIView
                         } else if rating != ratingButtons.index(of: button)! {
                             ratingForTouchBegan = -1
                             rating = ratingButtons.index(of: button)!
+                            return
                         }
                     case .move:
-                        ratingForTouchBegan = -1
+                        ratingForTouchBegan = -2
                         if ratingButtons.index(of: button)! != rating {
                             rating = ratingButtons.index(of: button)!
                             return
@@ -202,9 +264,16 @@ class EmojiRatingView: UIView
                     }
                 }
             }
+            if type == .end && ratingForTouchBegan == -1
+            {
+                deselectButtons()
+                rating = -1
+                ratingForTouchBegan = -1
+                return
+            }
         }
     }
-
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         handleTouchEvent(touches: touches, withEvent: event, type: .began)
@@ -222,6 +291,16 @@ class EmojiRatingView: UIView
     }
     
 }
+
+// MARK: - RatingAnimationSettingsDelegate Implementation
+
+extension EmojiRatingView : RatingAnimationSettingsDelegate {
+    func getScale() -> CGFloat {
+        return selectedScale
+    }
+}
+
+// MARK: - UIImage Extension - convertToGrayScale
 
 extension UIImage
 {
