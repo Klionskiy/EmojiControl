@@ -12,6 +12,7 @@
 		1881DC5E1ED2C74F00D604F9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1881DC5C1ED2C74F00D604F9 /* Main.storyboard */; };
 		1881DC601ED2C74F00D604F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1881DC5F1ED2C74F00D604F9 /* Assets.xcassets */; };
 		1881DC631ED2C74F00D604F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1881DC611ED2C74F00D604F9 /* LaunchScreen.storyboard */; };
+		1881DC6B1ED2C7AB00D604F9 /* EmojiRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1881DC6A1ED2C7AB00D604F9 /* EmojiRatingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		1881DC5F1ED2C74F00D604F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1881DC621ED2C74F00D604F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1881DC641ED2C74F00D604F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1881DC6A1ED2C7AB00D604F9 /* EmojiRatingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmojiRatingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				1881DC581ED2C74F00D604F9 /* AppDelegate.swift */,
 				1881DC5A1ED2C74F00D604F9 /* ViewController.swift */,
+				1881DC6A1ED2C7AB00D604F9 /* EmojiRatingView.swift */,
 				1881DC5C1ED2C74F00D604F9 /* Main.storyboard */,
 				1881DC5F1ED2C74F00D604F9 /* Assets.xcassets */,
 				1881DC611ED2C74F00D604F9 /* LaunchScreen.storyboard */,
@@ -138,6 +141,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1881DC5B1ED2C74F00D604F9 /* ViewController.swift in Sources */,
+				1881DC6B1ED2C7AB00D604F9 /* EmojiRatingView.swift in Sources */,
 				1881DC591ED2C74F00D604F9 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
