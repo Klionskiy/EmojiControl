@@ -118,9 +118,7 @@ class EmojiRatingView: UIView
             }
         }
     }
-    
-    
-    
+
     // MARK: - Properties
     
     private enum events :Int {
@@ -236,8 +234,6 @@ class EmojiRatingView: UIView
     {
         super.layoutSubviews()
         self.createButtons()
-        UIView.animate(withDuration: 0.2) {}
-        
         
         if   0...maxRating ~= rating
         {
@@ -255,7 +251,6 @@ class EmojiRatingView: UIView
                 button.center.x = buttonsWidth/2  + spacing + CGFloat(index) * (buttonsWidth + spacing)
                 button.bounds.size = intrinsicContentSize
                 button.center.y = bounds.height/2
-                
             }
             
         }
