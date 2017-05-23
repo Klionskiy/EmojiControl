@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -29,8 +29,12 @@
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="selectedScale">
-                                        <real key="value" value="1.3500000000000001"/>
+                                        <real key="value" value="1.5"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="image1" value="angry"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="image2" value="no_emotions"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="image3" value="cry"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="image4" value="like"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
@@ -50,4 +54,10 @@
             <point key="canvasLocation" x="136.80000000000001" y="138.98050974512745"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="angry" width="220" height="230"/>
+        <image name="cry" width="180" height="180"/>
+        <image name="like" width="220" height="220"/>
+        <image name="no_emotions" width="220" height="230"/>
+    </resources>
 </document>
